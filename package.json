@@ -1,0 +1,31 @@
+{
+  "name": "proofly",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build --turbopack",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@clerk/nextjs": "^6.32.2",
+    "@midnight-ntwrk/wallet": "^5.0.0",
+    "@midnight-ntwrk/zswap": "^4.0.0",
+    "buffer": "^6.0.3",
+    "crypto-js": "^4.2.0",
+    "formidable": "^3.5.4",
+    "jimp": "^1.6.0",
+    "jsonwebtoken": "^9.0.2",
+    "jwt-decode": "^4.0.0",
+    "mongoose": "^8.18.2",
+    "next": "15.5.4",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "sharp": "^0.34.4",
+    "steg": "^0.1.5"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "tailwindcss": "^4"
+  }
+}
