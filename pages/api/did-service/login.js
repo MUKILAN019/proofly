@@ -1,6 +1,6 @@
 import { connectMongo } from '../../../components/lib/mongodb';
 import DidMapping from '../../../components/models/DidMapping';
-import { extractDataFromImage } from '../../../components/utils/steganography';
+import { extractDataFromSVG } from '../../../components/utils/steganography';
 import jwt from 'jsonwebtoken';
 
 export default async function handler(req, res) {
@@ -8,45 +8,31 @@ export default async function handler(req, res) {
         return res.status(405).json({ message: 'Method Not Allowed' });
     }
 
-    console.log('🔐 Starting login with steganographic badge...');
+    console.log('🔐 Starting login with SVG steganographic badge...');
 
     try {
         await connectMongo();
 
-        const { cloudinaryUrl, clerkUserId } = req.body;
+        const { svgData, clerkUserId } = req.body;
 
-        if (!cloudinaryUrl || !clerkUserId) {
+        if (!svgData || !clerkUserId) {
             return res.status(400).json({ 
-                message: 'Cloudinary URL and user ID are required' 
+                message: 'SVG data and user ID are required' 
             });
         }
 
-        console.log('📥 Downloading image from Cloudinary...');
+        console.log('🔄 Extracting data from SVG badge...');
         
-        // Download image from Cloudinary
-        const imageResponse = await fetch(cloudinaryUrl);
-        if (!imageResponse.ok) {
-            throw new Error('Failed to download image from Cloudinary');
-        }
+        const extractedData = await extractDataFromSVG(svgData);
 
-        const arrayBuffer = await imageResponse.arrayBuffer();
-        const imageBuffer = Buffer.from(arrayBuffer);
-
-        console.log('🔄 Extracting data from badge image...');
-        
-        // Extract data from steganographic image
-        const extractedData = await extractDataFromImage(imageBuffer);
-
-        // Verify extracted data
         if (!extractedData.did || !extractedData.publicKey) {
             return res.status(400).json({ 
-                message: 'Invalid badge image: No identity data found' 
+                message: 'Invalid badge SVG: No identity data found' 
             });
         }
 
         console.log('🔍 Checking database for DID:', extractedData.did);
         
-        // Check database for DID
         const storedMapping = await DidMapping.findOne({ 
             clerkUserId, 
             didId: extractedData.did 
@@ -66,34 +52,39 @@ export default async function handler(req, res) {
             });
         }
 
-        // Generate authentication token
+        // Update last login timestamp
+        await DidMapping.updateOne(
+            { clerkUserId },
+            { lastLogin: new Date() }
+        );
+
+        const badgeDownloaded = storedMapping.metadata?.badgeDownloaded || false;
+
         const authToken = jwt.sign(
             { 
                 did: extractedData.did,
                 clerkUserId: clerkUserId,
                 verified: true,
+                badgeDownloaded: badgeDownloaded,
                 timestamp: new Date().toISOString()
             },
             process.env.JWT_SECRET || 'fallback-secret',
             { expiresIn: '24h' }
         );
 
-        // Update last verification timestamp
-        await DidMapping.updateOne(
-            { clerkUserId },
-            { lastVerified: new Date() }
-        );
-
         console.log('✅ Login successful for DID:', extractedData.did);
 
+        // ALWAYS redirect to mainoffer after SVG login
         return res.status(200).json({
             success: true,
-            message: 'Login successful using steganographic badge',
+            message: 'Login successful using steganographic SVG badge',
             did: extractedData.did,
             authToken: authToken,
-            badgeImage: {
-                url: cloudinaryUrl,
-                verified: true
+            badgeDownloaded: badgeDownloaded,
+            redirectTo: '/mainoffer', // Always go to mainoffer after SVG login
+            badgeSVG: {
+                verified: true,
+                data: svgData
             },
             userProfile: {
                 did: extractedData.did,

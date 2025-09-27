@@ -23,21 +23,30 @@ const DidMappingSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    badgeImage: {
-        type: String, // Base64 encoded image with steganography
+    badgeSVG: {
+        type: String,
         required: true,
     },
     metadata: {
-        imageHash: String,
+        svgHash: String,
         steganographyData: {
             did: String,
             publicKey: String,
             timestamp: Date,
             version: String
         },
-        imageFormat: {
+        format: {
             type: String,
-            default: 'png'
+            default: 'svg'
+        },
+        badgeDownloaded: {
+            type: Boolean,
+            default: false
+        },
+        downloadTimestamp: Date,
+        accessRestricted: {
+            type: Boolean,
+            default: false
         }
     },
     status: {
@@ -50,6 +59,10 @@ const DidMappingSchema = new mongoose.Schema({
         default: Date.now,
     },
     lastVerified: {
+        type: Date,
+        default: Date.now,
+    },
+    lastLogin: {
         type: Date,
         default: Date.now,
     },

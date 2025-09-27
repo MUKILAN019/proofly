@@ -2,7 +2,7 @@ import { connectMongo } from '../../../components/lib/mongodb';
 import DidMapping from '../../../components/models/DidMapping';
 
 export default async function handler(req, res) {
-    if (req.method !== 'GET') {
+    if (req.method !== 'POST') {
         return res.status(405).json({ message: 'Method Not Allowed' });
     }
 
@@ -28,37 +28,32 @@ export default async function handler(req, res) {
             return res.status(401).json({ message: 'Invalid token' });
         }
 
-        // Find user's DID
-        const didMapping = await DidMapping.findOne({ clerkUserId });
-        
-        if (!didMapping) {
-            return res.status(404).json({ message: 'DID not found' });
+        // Mark badge as downloaded and restrict access
+        const result = await DidMapping.updateOne(
+            { clerkUserId },
+            { 
+                $set: { 
+                    'metadata.badgeDownloaded': true,
+                    'metadata.downloadTimestamp': new Date(),
+                    'metadata.accessRestricted': true
+                } 
+            }
+        );
+
+        if (result.modifiedCount === 0) {
+            return res.status(404).json({ message: 'User not found or already marked as downloaded' });
         }
 
         return res.status(200).json({
             success: true,
-            did: {
-                id: didMapping.didId,
-                timestamp: didMapping.createdAt,
-                status: didMapping.status
-            },
-            badgeSVG: {
-                data: didMapping.badgeSVG,
-                mimeType: 'image/svg+xml',
-                metadata: didMapping.metadata || {}
-            },
-            badgeDownloaded: didMapping.metadata?.badgeDownloaded || false,
-            profile: {
-                university: 'Kalasalingam University',
-                credentialType: 'Proof-of-Right'
-            }
+            message: 'Badge download status updated successfully. Dashboard access restricted.'
         });
 
     } catch (error) {
-        console.error('Profile fetch error:', error);
+        console.error('Error marking badge as downloaded:', error);
         return res.status(500).json({ 
             success: false,
-            message: 'Failed to fetch profile',
+            message: 'Failed to update badge download status',
             error: error.message
         });
     }

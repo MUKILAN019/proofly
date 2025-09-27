@@ -32,33 +32,23 @@ export default async function handler(req, res) {
         const didMapping = await DidMapping.findOne({ clerkUserId });
         
         if (!didMapping) {
-            return res.status(404).json({ message: 'DID not found' });
+            return res.status(200).json({
+                accessAllowed: true, // Allow access if no DID exists
+            });
         }
 
+        // Check if badge has been downloaded - BLOCK access if downloaded
+        const badgeDownloaded = didMapping.metadata?.badgeDownloaded || false;
+        
         return res.status(200).json({
-            success: true,
-            did: {
-                id: didMapping.didId,
-                timestamp: didMapping.createdAt,
-                status: didMapping.status
-            },
-            badgeSVG: {
-                data: didMapping.badgeSVG,
-                mimeType: 'image/svg+xml',
-                metadata: didMapping.metadata || {}
-            },
-            badgeDownloaded: didMapping.metadata?.badgeDownloaded || false,
-            profile: {
-                university: 'Kalasalingam University',
-                credentialType: 'Proof-of-Right'
-            }
+            accessAllowed: !badgeDownloaded, // Block if downloaded
         });
 
     } catch (error) {
-        console.error('Profile fetch error:', error);
+        console.error('Error checking dashboard access:', error);
         return res.status(500).json({ 
             success: false,
-            message: 'Failed to fetch profile',
+            message: 'Failed to check access permission',
             error: error.message
         });
     }
