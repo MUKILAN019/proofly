@@ -88,8 +88,11 @@ export default function Dashboard() {
 
     if (!isLoaded || isLoading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#154D71] via-[#1C6EA4] to-[#33A1E0]">
-                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-white"></div>
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+                <div className="relative">
+                    <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+                    <div className="absolute inset-0 w-16 h-16 border-4 border-transparent border-t-blue-400 rounded-full animate-spin animate-reverse"></div>
+                </div>
             </div>
         );
     }
@@ -100,76 +103,95 @@ export default function Dashboard() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-[#154D71] via-[#1C6EA4] to-[#33A1E0]">
-            <div className="container mx-auto px-6 py-8">
-                <div className="text-center mb-8">
-                    <h1 className="text-4xl font-bold text-white mb-2">Download Your Badge</h1>
-                    <p className="text-blue-100">Welcome, <strong className='text-amber-200'>{user?.firstName}</strong>!</p>
-                    <p className="text-blue-200 text-sm mt-2">Download your SVG badge to complete the process</p>
-                </div>
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
+            {/* Background Pattern */}
+            <div className="absolute inset-0 opacity-5">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-purple-600/20"></div>
+                <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+                            <path d="M 60 0 L 0 0 0 60" fill="none" stroke="white" strokeWidth="1"/>
+                        </pattern>
+                    </defs>
+                    <rect width="100%" height="100%" fill="url(#grid)" />
+                </svg>
+            </div>
 
-                <div className="bg-white rounded-xl shadow-xl p-6 mb-6">
-                    <div className="flex flex-col md:flex-row items-center justify-between">
-                        <div className="flex items-center mb-4 md:mb-0">
-                            <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
-                                {user?.firstName?.[0]}{user?.lastName?.[0]}
-                            </div>
-                            <div className="ml-4">
-                                <h2 className="text-xl font-bold text-black">{user?.firstName} {user?.lastName}</h2>
-                                <p className="text-gray-600">{user?.primaryEmailAddress?.emailAddress}</p>
-                                {userDid && (
-                                    <p className="text-sm text-gray-500 break-all">DID: {userDid.id}</p>
-                                )}
-                            </div>
-                        </div>
-                        
-                        <button 
-                            onClick={handleDownloadSVG}
-                            className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors font-semibold"
-                        >
-                            📥 Download SVG Badge
-                        </button>
+            <div className="relative z-10 container mx-auto px-6 py-12">
+                {/* Header Section */}
+                <div className="text-center mb-12">
+                    <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-2xl mb-6 shadow-2xl">
+                        <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                    </div>
+                    <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-white via-emerald-100 to-white bg-clip-text text-transparent mb-4 tracking-tight">
+                        Download Badge
+                    </h1>
+                    <div className="max-w-2xl mx-auto">
+                        <p className="text-xl text-slate-300">
+                            Welcome, <span className="text-emerald-400 font-semibold">{user?.firstName}</span>
+                        </p>
+                        <p className="text-slate-400 mt-2">
+                            Download your digital badge to complete the verification process
+                        </p>
                     </div>
                 </div>
 
-                {/* Badge Preview */}
-                {badgeSVG?.data && (
-                    <div className="bg-white rounded-xl shadow-xl p-6">
-                        <h3 className="text-xl font-bold text-gray-900 mb-4 text-center">Your Digital Badge Preview</h3>
-                        <div className="flex justify-center">
-                            <div 
-                                className="w-64 h-64"
-                                dangerouslySetInnerHTML={{ __html: badgeSVG.data }}
-                            />
-                        </div>
-                        <div className="text-center mt-4">
+                {/* User Profile Card */}
+                <div className="max-w-4xl mx-auto mb-8">
+                    <div className="bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20 shadow-2xl">
+                        <div className="flex flex-col md:flex-row items-center justify-between">
+                            <div className="flex items-center mb-6 md:mb-0">
+                                <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-xl">
+                                    {user?.firstName?.[0]}{user?.lastName?.[0]}
+                                </div>
+                                <div className="ml-6">
+                                    <h2 className="text-2xl font-bold text-white">{user?.firstName} {user?.lastName}</h2>
+                                    <p className="text-slate-300 text-lg">{user?.primaryEmailAddress?.emailAddress}</p>
+                                    {userDid && (
+                                        <div className="mt-2 p-2 bg-slate-800/50 rounded-lg border border-slate-700">
+                                            <p className="text-xs text-slate-400 font-mono break-all">
+                                                DID: {userDid.id}
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                            
                             <button 
                                 onClick={handleDownloadSVG}
-                                className="bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 transition-colors text-lg font-semibold"
+                                className="group relative px-8 py-4 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white rounded-2xl font-semibold shadow-2xl hover:shadow-emerald-500/25 transition-all duration-300 transform hover:-translate-y-1 flex items-center space-x-3"
                             >
-                                📥 Download SVG Badge & Return to Manager
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                <span>Download Badge</span>
                             </button>
-                            <p className="text-gray-600 text-sm mt-3">
-                                After download, you will return to manager and cannot access this dashboard again
-                            </p>
                         </div>
                     </div>
-                )}
+                </div>
+
 
                 {/* Important Notice */}
-                <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 mt-6">
-                    <div className="flex items-center">
-                        <div className="w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center mr-4">
-                            <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                            </svg>
-                        </div>
-                        <div>
-                            <h3 className="font-semibold text-yellow-800">Important Notice</h3>
-                            <p className="text-yellow-700 text-sm mt-1">
-                                After downloading your badge, you will return to the manager page. 
-                                You will not be able to access this dashboard again.
-                            </p>
+                <div className="max-w-4xl mx-auto">
+                    <div className="bg-blue-50/10 border border-blue-300/30 rounded-2xl p-6 backdrop-blur-sm">
+                        <div className="flex items-start space-x-4">
+                            <div className="flex-shrink-0">
+                                <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+                                    <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div className="flex-1">
+                                <h3 className="font-semibold text-blue-200 text-lg">Important Notice</h3>
+                                <p className="text-blue-300 mt-2 leading-relaxed">
+                                    After downloading your badge, you will automatically return to the manager page. 
+                                    You will not be able to access this dashboard again. Please ensure you save your 
+                                    badge file in a secure location for future use.
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
