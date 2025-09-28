@@ -6,10 +6,6 @@ import { useEffect } from 'react';
 export default function Home() {
   const router = useRouter();
 
-  useEffect(() => {
-    // This will be handled by your middleware/auth logic
-  }, []);
-
   const signInOnlyAppearance = {
     elements: {
       footerAction: {
@@ -148,7 +144,7 @@ export default function Home() {
             <div className="relative group">
               <div className="absolute -inset-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl blur-lg opacity-30 group-hover:opacity-50 transition-opacity duration-300"></div>
               <img 
-                src="https://lakeland.edu/perch/resources/sadgasg-w600.png" 
+                src="/assets/student.png"
                 alt="Student Graduate" 
                 className="relative rounded-3xl shadow-2xl border-4 border-blue-400/50 w-full max-w-[550px] h-auto object-cover"
               />
