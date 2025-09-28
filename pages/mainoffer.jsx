@@ -25,7 +25,7 @@ export default function MainOffer() {
         sessionStorage.getItem("hasValidBadgeAccess") === "true";
 
       if (!badgeAccess) {
-        router.replace("/"); // back to manager/login page
+        router.replace("/");
         return;
       }
 
