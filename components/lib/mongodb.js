@@ -1,8 +1,7 @@
 // lib/mongodb.js
 import mongoose from 'mongoose';
 
-// IMPORTANT: NEVER expose this URI directly in code. Use environment variables (.env.local)
-const MONGODB_URI = 'mongodb+srv://mukilanp:cyber19@cluster0.w639azh.mongodb.net/proofly'; 
+const MONGODB_URI = process.env.MONGODB_URI; 
 // The database name is appended here: 'proofly'
 if (!MONGODB_URI) {
   throw new Error('Please define the MONGODB_URI environment variable');
